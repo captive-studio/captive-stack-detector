@@ -29,5 +29,45 @@ RSpec.describe CaptiveStackDetector do
       expect { described_class.detect }
         .to raise_error(CaptiveStackDetector::UnsupportedStack)
     end
+
+    it "retourne subtype api si Gemfile rails sans gems d'assets" do
+      result = described_class.detect(gemfile: "gem 'rails'")
+      expect(result.subtype).to eq("api")
+    end
+
+    it "retourne subtype app si Gemfile rails avec sprockets" do
+      result = described_class.detect(gemfile: "gem 'rails'\ngem 'sprockets'")
+      expect(result.subtype).to eq("app")
+    end
+
+    it "retourne subtype app si Gemfile rails avec propshaft" do
+      result = described_class.detect(gemfile: "gem 'rails'\ngem 'propshaft'")
+      expect(result.subtype).to eq("app")
+    end
+
+    it "retourne with_postgres true si Gemfile contient pg" do
+      result = described_class.detect(gemfile: "gem 'rails'\ngem 'pg'")
+      expect(result.with_postgres).to be(true)
+    end
+
+    it "retourne with_postgres false si Gemfile sans pg" do
+      result = described_class.detect(gemfile: "gem 'rails'")
+      expect(result.with_postgres).to be(false)
+    end
+
+    it "retourne with_redis true si Gemfile contient redis" do
+      result = described_class.detect(gemfile: "gem 'rails'\ngem 'redis'")
+      expect(result.with_redis).to be(true)
+    end
+
+    it "retourne worker_command bundle exec sidekiq si Gemfile contient sidekiq" do
+      result = described_class.detect(gemfile: "gem 'rails'\ngem 'sidekiq'")
+      expect(result.worker_command).to eq("bundle exec sidekiq")
+    end
+
+    it "retourne worker_command nil si Gemfile sans worker connu" do
+      result = described_class.detect(gemfile: "gem 'rails'")
+      expect(result.worker_command).to be_nil
+    end
   end
 end
