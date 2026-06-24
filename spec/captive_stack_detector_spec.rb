@@ -15,8 +15,13 @@ RSpec.describe CaptiveStackDetector do
         .to raise_error(CaptiveStackDetector::UnsupportedStack)
     end
 
+    it "lève UnsupportedStack si package.json sans script start" do
+      expect { described_class.detect(package_json: '{"dependencies":{"express":"^4.0"}}') }
+        .to raise_error(CaptiveStackDetector::UnsupportedStack)
+    end
+
     it "retourne type node si package.json présent sans expo" do
-      result = described_class.detect(package_json: '{"dependencies":{"express":"^4.0"}}')
+      result = described_class.detect(package_json: '{"scripts":{"start":"node index.js"},"dependencies":{"express":"^4.0"}}')
       expect(result.type).to eq("node")
     end
 

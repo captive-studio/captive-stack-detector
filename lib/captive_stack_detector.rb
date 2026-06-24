@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "json"
 require_relative "captive_stack_detector/gemfile_analyzer"
 
 module CaptiveStackDetector
@@ -23,8 +24,13 @@ module CaptiveStackDetector
   private_class_method :detect_rails
 
   def self.detect_js(package_json)
-    type = package_json.include?('"expo"') ? "expo" : "node"
-    Result.new(type: type)
+    parsed = JSON.parse(package_json)
+    deps = parsed.fetch("dependencies", {}).merge(parsed.fetch("devDependencies", {}))
+    return Result.new(type: "expo") if deps.key?("expo")
+
+    raise UnsupportedStack unless parsed.dig("scripts", "start")
+
+    Result.new(type: "node")
   end
   private_class_method :detect_js
 end

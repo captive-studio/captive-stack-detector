@@ -9,10 +9,10 @@ Valeurs supportées :
 | Valeur | Condition |
 |---|---|
 | `rails` | Gemfile présent contenant `gem 'rails'` |
-| `node` | package.json présent, sans dépendance `expo` |
-| `expo` | package.json présent avec la dépendance `expo` |
+| `node` | package.json présent avec un script `"start"`, sans dépendance `expo` |
+| `expo` | package.json présent avec la dépendance `expo` (script `"start"` non requis) |
 
-Tout autre cas lève `CaptiveStackDetector::UnsupportedStack`.
+Tout autre cas lève `CaptiveStackDetector::UnsupportedStack`. En particulier, un package.json sans script `"start"` (package npm, librairie, monorepo racine) n'est pas une stack déployable.
 
 _Avoid_ : "type d'app", "langage", "framework détecté"
 
