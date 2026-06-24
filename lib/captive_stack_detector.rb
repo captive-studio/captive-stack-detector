@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "captive_stack_detector/gemfile_analyzer"
+
 module CaptiveStackDetector
   Result = Struct.new(:type, :subtype, :with_postgres, :with_redis, :worker_command, keyword_init: true)
   UnsupportedStack = Class.new(StandardError)
@@ -11,22 +13,14 @@ module CaptiveStackDetector
     raise UnsupportedStack
   end
 
-  ASSET_GEMS = %w[sprockets propshaft importmap-rails].freeze
-
   def self.detect_rails(gemfile)
-    raise UnsupportedStack unless gem?(gemfile, "rails")
+    analyzer = GemfileAnalyzer.new(gemfile)
+    raise UnsupportedStack unless analyzer.rails?
 
-    subtype = ASSET_GEMS.any? { |g| gem?(gemfile, g) } ? "app" : "api"
-    worker_command = gem?(gemfile, "sidekiq") ? "bundle exec sidekiq" : nil
-    Result.new(type: "rails", subtype: subtype, with_postgres: gem?(gemfile, "pg"), with_redis: gem?(gemfile, "redis"),
-               worker_command: worker_command)
+    Result.new(type: "rails", subtype: analyzer.subtype, with_postgres: analyzer.with_postgres,
+               with_redis: analyzer.with_redis, worker_command: analyzer.worker_command)
   end
   private_class_method :detect_rails
-
-  def self.gem?(gemfile, name)
-    gemfile.match?(/gem ['"]#{Regexp.escape(name)}['"]/)
-  end
-  private_class_method :gem?
 
   def self.detect_js(package_json)
     type = package_json.include?('"expo"') ? "expo" : "node"
