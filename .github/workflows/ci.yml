@@ -1,0 +1,10 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ruby-ci:
+    uses: Captive-Studio/captive-ci/.github/workflows/ruby-ci.yml@main
