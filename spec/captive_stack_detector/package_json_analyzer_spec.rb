@@ -24,4 +24,24 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     pkg = JSON.generate({ "devDependencies" => { "expo" => "~50.0.0" } })
     expect(described_class.new(pkg).type).to eq("expo")
   end
+
+  it "retourne database postgres si pg présent dans dependencies" do
+    pkg = JSON.generate({ "dependencies" => { "pg" => "^8.0", "express" => "^4.0" } })
+    expect(described_class.new(pkg).database).to eq("postgres")
+  end
+
+  it "retourne database nil si pas de pg" do
+    pkg = JSON.generate({ "dependencies" => { "express" => "^4.0" } })
+    expect(described_class.new(pkg).database).to be_nil
+  end
+
+  it "retourne queue redis si ioredis présent dans dependencies" do
+    pkg = JSON.generate({ "dependencies" => { "ioredis" => "^5.0" } })
+    expect(described_class.new(pkg).queue).to eq("redis")
+  end
+
+  it "retourne queue nil si pas de client redis" do
+    pkg = JSON.generate({ "dependencies" => { "express" => "^4.0" } })
+    expect(described_class.new(pkg).queue).to be_nil
+  end
 end

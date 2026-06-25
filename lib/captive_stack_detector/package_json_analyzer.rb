@@ -15,6 +15,14 @@ module CaptiveStackDetector
       nil
     end
 
+    def database
+      deps.key?("pg") ? "postgres" : nil
+    end
+
+    def queue
+      (deps.key?("redis") || deps.key?("ioredis")) ? "redis" : nil
+    end
+
     private
 
     def deps
