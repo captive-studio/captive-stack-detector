@@ -214,6 +214,7 @@ RSpec.describe CaptiveStackDetector do
         stub_github_404("Gemfile")
         stub_github_404("package.json")
         stub_github_404(".tool-versions")
+        stub_github_404(".ruby-version")
         stub_github_404(".nvmrc")
         stub_github_404("Procfile")
         stub_github_404("config/storage.yml")
@@ -247,6 +248,19 @@ RSpec.describe CaptiveStackDetector do
         stub_github(".tool-versions", "ruby 3.2.1\n")
         result = described_class.detect(github_token: token, repo: repo)
         expect(result.runtime.ruby).to eq("3.2.1")
+      end
+
+      it "retourne runtime.ruby depuis .ruby-version GitHub" do
+        stub_github("Gemfile", "gem 'rails'")
+        stub_github(".ruby-version", "3.3.0\n")
+        result = described_class.detect(github_token: token, repo: repo)
+        expect(result.runtime.ruby).to eq("3.3.0")
+      end
+
+      it "retourne runtime.ruby depuis ruby dans le Gemfile GitHub" do
+        stub_github("Gemfile", "ruby \"3.3.4\"\ngem 'rails'")
+        result = described_class.detect(github_token: token, repo: repo)
+        expect(result.runtime.ruby).to eq("3.3.4")
       end
 
       it "retourne runtime.node depuis .nvmrc GitHub" do
