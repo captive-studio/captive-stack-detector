@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative "lib/captive_stack_detector/version"
+
 Gem::Specification.new do |spec|
   spec.name    = "captive-stack-detector"
-  spec.version = "0.1.0"
+  spec.version = CaptiveStackDetector::VERSION
   spec.authors = [ "Captive Studio" ]
   spec.email   = [ "dev@captive.fr" ]
 
