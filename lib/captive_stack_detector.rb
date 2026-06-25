@@ -1,18 +1,9 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "captive_stack_detector/types"
 require_relative "captive_stack_detector/file_reader"
 require_relative "captive_stack_detector/gemfile_analyzer"
-
-module CaptiveStackDetector
-  Services = Data.define(:database, :queue)
-  Worker   = Data.define(:command)
-  Runtime  = Data.define(:ruby, :node)
-  Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars)
-
-  UnsupportedStack = Class.new(StandardError)
-end
-
 require_relative "captive_stack_detector/rails_stack_detector"
 require_relative "captive_stack_detector/js_stack_detector"
 
