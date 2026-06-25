@@ -15,3 +15,5 @@ group :test do
   gem "simplecov", require: false
   gem "rubycritic", require: false
 end
+
+gem "webmock", "~> 3.26", group: :test
