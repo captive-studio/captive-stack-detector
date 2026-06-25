@@ -2,6 +2,7 @@
 
 require_relative "env_vars_scanner"
 require_relative "node_version_detector"
+require_relative "ruby_version_detector"
 
 module CaptiveStackDetector
   class FileContentParser
@@ -10,8 +11,7 @@ module CaptiveStackDetector
     end
 
     def ruby_version
-      content = @reader.read(".tool-versions")
-      content&.match(/^ruby\s+(\S+)/)&.captures&.first
+      RubyVersionDetector.new(@reader).detect
     end
 
     def node_version
