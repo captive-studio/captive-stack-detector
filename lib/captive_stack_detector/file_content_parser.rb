@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "env_vars_scanner"
+require_relative "node_version_detector"
 
 module CaptiveStackDetector
   class FileContentParser
@@ -14,14 +15,7 @@ module CaptiveStackDetector
     end
 
     def node_version
-      if (nvmrc = @reader.read(".nvmrc"))
-        return nvmrc.strip.sub(/^v/, "").split(".").first
-      end
-      if (tv = @reader.read(".tool-versions"))
-        m = tv.match(/^nodejs\s+(\d+)/)
-        return m[1] if m
-      end
-      nil
+      NodeVersionDetector.new(@reader).detect
     end
 
     def env_vars
