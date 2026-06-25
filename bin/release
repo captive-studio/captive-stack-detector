@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Usage: bin/release [patch|minor|major|x.y.z]
+#
+# Bumpe la version, commit, crée le tag et pousse.
+# Déclenche le workflow GitHub Actions qui crée la Release.
+
+require_relative "../lib/captive_stack_detector/version"
+
+def bump(current, type)
+  major, minor, patch = current.split(".").map(&:to_i)
+  case type
+  when "major" then "#{major + 1}.0.0"
+  when "minor" then "#{major}.#{minor + 1}.0"
+  when "patch" then "#{major}.#{minor}.#{patch + 1}"
+  else type
+  end
+end
+
+def run!(cmd)
+  system(cmd) || abort("Échec : #{cmd}")
+end
+
+current = CaptiveStackDetector::VERSION
+type    = ARGV[0] || "patch"
+
+unless type.match?(/\A(major|minor|patch|\d+\.\d+\.\d+)\z/)
+  abort "Usage: bin/release [patch|minor|major|x.y.z]"
+end
+
+next_version = bump(current, type)
+
+puts "#{current} → #{next_version}"
+print "Confirmer ? [y/N] "
+exit(1) unless $stdin.gets.chomp.downcase == "y"
+
+unless system("git diff --quiet && git diff --cached --quiet")
+  abort "Erreur : des modifications non commitées existent."
+end
+
+version_file = File.expand_path("../lib/captive_stack_detector/version.rb", __dir__)
+File.write(version_file, File.read(version_file).gsub(current, next_version))
+
+run! "git add lib/captive_stack_detector/version.rb"
+run! %(git commit -m "🔖 Release v#{next_version}")
+run! "git tag v#{next_version}"
+run! "git push origin HEAD"
+run! "git push origin v#{next_version}"
+
+puts "✅ v#{next_version} releasé — GitHub Actions crée la Release."
