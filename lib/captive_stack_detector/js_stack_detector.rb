@@ -17,11 +17,24 @@ module CaptiveStackDetector
       Result.new(
         type:     type,
         subtype:  nil,
-        services: Services.new(database: nil, queue: nil),
-        worker:   nil,
+        services: Services.new(database: @analyzer.database, queue: @analyzer.queue),
+        worker:   build_worker,
         runtime:  Runtime.new(ruby: nil, node: @reader.node_version),
         env_vars: {},
       )
+    end
+
+    private
+
+    def build_worker
+      procfile = @reader.read("Procfile")
+      return nil unless procfile
+
+      procfile.each_line do |line|
+        m = line.match(/^worker:\s*(.+)$/)
+        return Worker.new(command: m[1].strip) if m
+      end
+      nil
     end
   end
 end
