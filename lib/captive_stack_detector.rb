@@ -1,36 +1,35 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "captive_stack_detector/file_reader"
 require_relative "captive_stack_detector/gemfile_analyzer"
 
 module CaptiveStackDetector
-  Result = Struct.new(:type, :subtype, :with_postgres, :with_redis, :worker_command, keyword_init: true)
-  UnsupportedStack = Class.new(StandardError)
+  Services = Data.define(:database, :queue)
+  Worker   = Data.define(:command)
+  Runtime  = Data.define(:ruby, :node)
+  Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars)
 
-  def self.detect(gemfile: nil, package_json: nil)
-    return detect_rails(gemfile) if gemfile
-    return detect_js(package_json) if package_json
+  UnsupportedStack = Class.new(StandardError)
+end
+
+require_relative "captive_stack_detector/rails_stack_detector"
+require_relative "captive_stack_detector/js_stack_detector"
+
+module CaptiveStackDetector
+  def self.detect(local_path: nil, github_token: nil, repo: nil)
+    reader = FileReader.build(local_path: local_path, github_token: github_token, repo: repo)
+    detect_from(reader)
+  end
+
+  def self.detect_from(reader)
+    gemfile      = reader.read("Gemfile")
+    package_json = reader.read("package.json")
+
+    return RailsStackDetector.new(reader, GemfileAnalyzer.new(gemfile)).detect if gemfile
+    return JsStackDetector.new(reader, package_json).detect                    if package_json
 
     raise UnsupportedStack
   end
-
-  def self.detect_rails(gemfile)
-    analyzer = GemfileAnalyzer.new(gemfile)
-    raise UnsupportedStack unless analyzer.rails?
-
-    Result.new(type: "rails", subtype: analyzer.subtype, with_postgres: analyzer.with_postgres,
-               with_redis: analyzer.with_redis, worker_command: analyzer.worker_command)
-  end
-  private_class_method :detect_rails
-
-  def self.detect_js(package_json)
-    parsed = JSON.parse(package_json)
-    deps = parsed.fetch("dependencies", {}).merge(parsed.fetch("devDependencies", {}))
-    return Result.new(type: "expo") if deps.key?("expo")
-
-    raise UnsupportedStack unless parsed.dig("scripts", "start")
-
-    Result.new(type: "node")
-  end
-  private_class_method :detect_js
+  private_class_method :detect_from
 end
