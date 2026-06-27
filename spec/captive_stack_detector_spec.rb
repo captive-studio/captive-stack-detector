@@ -218,6 +218,7 @@ RSpec.describe CaptiveStackDetector do
         stub_github_404(".nvmrc")
         stub_github_404("Procfile")
         stub_github_404("config/storage.yml")
+        stub_github_404("Aptfile")
       end
 
       it "retourne type rails depuis GitHub via Gemfile" do
