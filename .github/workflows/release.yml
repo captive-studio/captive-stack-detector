@@ -16,7 +16,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "4.0"
-          bundler-cache: false
+          bundler-cache: true
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
