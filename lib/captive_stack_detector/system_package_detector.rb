@@ -16,7 +16,7 @@ module CaptiveStackDetector
     end
 
     def packages
-      from_gemfile + from_aptfile
+      (from_gemfile + from_aptfile).uniq
     end
 
     private

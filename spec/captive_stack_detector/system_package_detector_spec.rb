@@ -57,6 +57,14 @@ RSpec.describe CaptiveStackDetector::SystemPackageDetector do
     end
   end
 
+  context "avec gem ruby-vips et Aptfile contenant libvips42" do
+    subject(:detector) { described_class.new(gemfile: "gem 'ruby-vips'", aptfile: "libvips42\n") }
+
+    it "ne retourne pas de doublons" do
+      expect(detector.packages).to eq(%w[libvips42 libvips-dev])
+    end
+  end
+
   context "avec un Aptfile contenant des commentaires" do
     subject(:detector) { described_class.new(gemfile:, aptfile: "# dépendance image\nwkhtmltopdf\n") }
 
