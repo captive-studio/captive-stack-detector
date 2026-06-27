@@ -35,14 +35,14 @@ puts "#{current} → #{next_version}"
 print "Confirmer ? [y/N] "
 exit(1) unless $stdin.gets.chomp.downcase == "y"
 
-unless system("git diff --quiet && git diff --cached --quiet")
-  abort "Erreur : des modifications non commitées existent."
-end
+dirty = `git diff --name-only && git diff --cached --name-only`.lines.map(&:strip).reject { |f| f == "Gemfile.lock" }
+abort "Erreur : des modifications non commitées existent." unless dirty.empty?
 
 version_file = File.expand_path("../lib/captive_stack_detector/version.rb", __dir__)
 File.write(version_file, File.read(version_file).gsub(current, next_version))
 
-run! "git add lib/captive_stack_detector/version.rb"
+run! "bundle install"
+run! "git add lib/captive_stack_detector/version.rb Gemfile.lock"
 run! %(git commit -m "🔖 Release v#{next_version}")
 run! "git tag v#{next_version}"
 run! "git push origin HEAD"
