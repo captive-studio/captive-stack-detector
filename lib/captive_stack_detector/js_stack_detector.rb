@@ -15,12 +15,13 @@ module CaptiveStackDetector
       raise UnsupportedStack unless type
 
       Result.new(
-        type:     type,
-        subtype:  nil,
-        services: Services.new(database: @analyzer.database, queue: @analyzer.queue),
-        worker:   build_worker,
-        runtime:  Runtime.new(ruby: nil, node: @reader.node_version),
-        env_vars: {},
+        type:            type,
+        subtype:         nil,
+        services:        Services.new(database: @analyzer.database, queue: @analyzer.queue),
+        worker:          build_worker,
+        runtime:         Runtime.new(ruby: nil, node: @reader.node_version),
+        env_vars:        {},
+        system_packages: [],
       )
     end
 

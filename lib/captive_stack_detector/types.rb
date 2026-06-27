@@ -4,7 +4,7 @@ module CaptiveStackDetector
   Services = Data.define(:database, :queue)
   Worker   = Data.define(:command)
   Runtime  = Data.define(:ruby, :node)
-  Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars)
+  Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars, :system_packages)
 
   UnsupportedStack = Class.new(StandardError)
 end

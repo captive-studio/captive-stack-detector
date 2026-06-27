@@ -11,4 +11,15 @@ RSpec.describe CaptiveStackDetector do
       expect(services.queue).to eq("redis")
     end
   end
+
+  describe "Result" do
+    it "expose system_packages" do
+      result = described_class::Result.new(
+        type: "rails", subtype: "app",
+        services: nil, worker: nil, runtime: nil, env_vars: [],
+        system_packages: %w[libvips42]
+      )
+      expect(result.system_packages).to eq(%w[libvips42])
+    end
+  end
 end
