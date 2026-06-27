@@ -7,6 +7,7 @@ ruby File.read(File.join(__dir__, ".tool-versions")).match(/^ruby (.+)$/)[1].str
 gemspec
 
 group :development, :test do
+  gem "rake", "13.4.2"
   gem "rubocop-config-captive", "~> 2.0", require: false
 end
 
