@@ -44,4 +44,24 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     pkg = JSON.generate({ "dependencies" => { "express" => "^4.0" } })
     expect(described_class.new(pkg).queue).to be_nil
   end
+
+  it "retourne subtype server si un framework SSR (next) est présent" do
+    pkg = JSON.generate({ "dependencies" => { "next" => "^14.0" }, "scripts" => { "start" => "next start" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
+
+  it "retourne subtype server pour nuxt" do
+    pkg = JSON.generate({ "dependencies" => { "nuxt" => "^3.0" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
+
+  it "retourne subtype server pour @sveltejs/kit" do
+    pkg = JSON.generate({ "devDependencies" => { "@sveltejs/kit" => "^2.0" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
+
+  it "retourne subtype server pour remix (paquets scopés @remix-run/*)" do
+    pkg = JSON.generate({ "dependencies" => { "@remix-run/node" => "^2.0", "@remix-run/react" => "^2.0" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "ssr_framework_detector"
 
 module CaptiveStackDetector
   class PackageJsonAnalyzer
@@ -13,6 +14,10 @@ module CaptiveStackDetector
       return "node" if @parsed.dig("scripts", "start")
 
       nil
+    end
+
+    def subtype
+      SsrFrameworkDetector.server?(deps) ? "server" : nil
     end
 
     def database

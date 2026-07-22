@@ -14,6 +14,12 @@ RSpec.describe CaptiveStackDetector::JsStackDetector do
     expect(result.type).to eq("node")
   end
 
+  it "retourne subtype server pour un package.json Next.js (SSR)" do
+    pkg = JSON.generate({ "dependencies" => { "next" => "^14.0" }, "scripts" => { "start" => "next start" } })
+    result = described_class.new(reader, pkg).detect
+    expect(result.subtype).to eq("server")
+  end
+
   it "retourne type expo si dépendance expo présente" do
     pkg = JSON.generate({ "dependencies" => { "expo" => "~50.0.0" } })
     result = described_class.new(reader, pkg).detect
