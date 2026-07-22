@@ -23,10 +23,10 @@ def run!(cmd)
 end
 
 current = CaptiveStackDetector::VERSION
-type    = ARGV[0] || "patch"
+type    = ARGV[0]
 
-unless type.match?(/\A(major|minor|patch|\d+\.\d+\.\d+)\z/)
-  abort "Usage: bin/release [patch|minor|major|x.y.z]"
+unless type&.match?(/\A(major|minor|patch|\d+\.\d+\.\d+)\z/)
+  abort "Usage: bin/release <patch|minor|major|x.y.z>"
 end
 
 next_version = bump(current, type)
