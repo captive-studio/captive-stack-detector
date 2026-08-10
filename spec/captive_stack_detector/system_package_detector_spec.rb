@@ -85,4 +85,38 @@ RSpec.describe CaptiveStackDetector::SystemPackageDetector do
       expect(detector.packages).to eq(%w[wkhtmltopdf libjemalloc2])
     end
   end
+
+  context "logs pendant la recherche" do
+    let(:gemfile) { "gem 'ruby-vips'" }
+    let(:detector) { described_class.new(gemfile:, aptfile: "libsqlite3-dev\n") }
+
+    it "logue chaque gem détectée avec ses paquets sur stderr" do
+      expect { detector.packages }.to output(/gem 'ruby-vips' détecté → libvips42, libvips-dev/).to_stderr
+    end
+
+    it "logue chaque paquet trouvé dans l'Aptfile sur stderr" do
+      expect { detector.packages }.to output(/Aptfile → paquet 'libsqlite3-dev'/).to_stderr
+    end
+
+    it "logue le résumé des paquets détectés sur stderr" do
+      expect { detector.packages }.to output(/paquets système détectés : libvips42, libvips-dev, libsqlite3-dev/).to_stderr
+    end
+  end
+
+  context "logs quand aucun paquet n'est trouvé" do
+    subject(:detector) { described_class.new(gemfile: "gem 'rails'", aptfile: nil) }
+
+    it "logue qu'aucun paquet n'a été détecté" do
+      expect { detector.packages }.to output(/paquets système détectés : aucun/).to_stderr
+    end
+  end
+
+  context "avec une gem mappée vers aucun paquet" do
+    let(:gemfile) { "gem 'wkhtmltopdf-binary'" }
+    let(:detector) { described_class.new(gemfile:, aptfile: nil) }
+
+    it "logue que la gem ne nécessite aucun paquet" do
+      expect { detector.packages }.to output(/gem 'wkhtmltopdf-binary' détecté → aucun paquet/).to_stderr
+    end
+  end
 end

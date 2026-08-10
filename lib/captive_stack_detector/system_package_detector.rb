@@ -16,19 +16,26 @@ module CaptiveStackDetector
     end
 
     def packages
-      (from_gemfile + from_aptfile).uniq
+      result = (from_gemfile + from_aptfile).uniq
+      $stderr.puts "[captive-stack-detector] paquets système détectés : #{result.any? ? result.join(", ") : "aucun"}"
+      result
     end
 
     private
 
     def from_gemfile
       GEM_TO_PACKAGES.each_with_object([]) do |(gem, pkgs), result|
-        result.concat(pkgs) if @gemfile.match?(/gem ['"]#{Regexp.escape(gem)}['"]/)
+        next unless @gemfile.match?(/gem ['"]#{Regexp.escape(gem)}['"]/)
+
+        $stderr.puts "[captive-stack-detector] gem '#{gem}' détecté → #{pkgs.any? ? pkgs.join(", ") : "aucun paquet"}"
+        result.concat(pkgs)
       end
     end
 
     def from_aptfile
-      @aptfile.lines.map { |line| line.split("#", 2).first.to_s.strip }.reject(&:empty?)
+      packages = @aptfile.lines.map { |line| line.split("#", 2).first.to_s.strip }.reject(&:empty?)
+      packages.each { |pkg| $stderr.puts "[captive-stack-detector] Aptfile → paquet '#{pkg}'" }
+      packages
     end
   end
 end
