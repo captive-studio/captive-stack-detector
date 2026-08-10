@@ -75,4 +75,14 @@ RSpec.describe CaptiveStackDetector::SystemPackageDetector do
       expect(detector.packages).to eq(%w[wkhtmltopdf])
     end
   end
+
+  context "avec un Aptfile contenant un commentaire en fin de ligne" do
+    subject(:detector) { described_class.new(gemfile:, aptfile: "wkhtmltopdf # ne fonctionne plus avec captive-platform\nlibjemalloc2\n") }
+
+    let(:gemfile) { "gem 'rails'" }
+
+    it "tronque le commentaire et ne garde que le nom du paquet" do
+      expect(detector.packages).to eq(%w[wkhtmltopdf libjemalloc2])
+    end
+  end
 end

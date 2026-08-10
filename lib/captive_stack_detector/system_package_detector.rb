@@ -28,7 +28,7 @@ module CaptiveStackDetector
     end
 
     def from_aptfile
-      @aptfile.lines.map(&:strip).reject { |l| l.empty? || l.start_with?("#") }
+      @aptfile.lines.map { |line| line.split("#", 2).first.to_s.strip }.reject(&:empty?)
     end
   end
 end
