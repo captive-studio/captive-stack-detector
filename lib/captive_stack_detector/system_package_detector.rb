@@ -6,7 +6,7 @@ module CaptiveStackDetector
       "ruby-vips"        => %w[libvips42 libvips-dev],
       "mini_magick"      => %w[imagemagick],
       "rmagick"          => %w[imagemagick],
-      "wkhtmltopdf-binary" => %w[wkhtmltopdf],
+      "wkhtmltopdf-binary" => %w[], # retiré de Debian Trixie, projet upstream abandonné
       "sqlite3"          => %w[libsqlite3-dev],
     }.freeze
 

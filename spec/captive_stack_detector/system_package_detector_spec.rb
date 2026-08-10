@@ -41,11 +41,11 @@ RSpec.describe CaptiveStackDetector::SystemPackageDetector do
     end
   end
 
-  context "avec gem wkhtmltopdf" do
+  context "avec gem wkhtmltopdf-binary" do
     let(:gemfile) { "gem 'wkhtmltopdf-binary'" }
 
-    it "retourne wkhtmltopdf" do
-      expect(detector.packages).to eq(%w[wkhtmltopdf])
+    it "ne retourne aucun paquet — wkhtmltopdf n'existe plus dans Debian Trixie et le projet upstream est abandonné" do
+      expect(detector.packages).to eq([])
     end
   end
 
