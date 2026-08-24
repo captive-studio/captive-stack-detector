@@ -5,10 +5,11 @@ require "captive_stack_detector/types"
 
 RSpec.describe CaptiveStackDetector do
   describe "Services" do
-    it "est un Data avec database et queue" do
-      services = described_class::Services.new(database: "postgres", queue: "redis")
+    it "est un Data avec database, queue et backend" do
+      services = described_class::Services.new(database: "postgres", queue: "redis", backend: "supabase")
       expect(services.database).to eq("postgres")
       expect(services.queue).to eq("redis")
+      expect(services.backend).to eq("supabase")
     end
   end
 

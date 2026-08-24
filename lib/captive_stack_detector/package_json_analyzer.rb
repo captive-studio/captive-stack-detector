@@ -21,11 +21,17 @@ module CaptiveStackDetector
     end
 
     def database
-      deps.key?("pg") ? "postgres" : nil
+      return "postgres" if deps.key?("pg") || backend
+
+      nil
     end
 
     def queue
       (deps.key?("redis") || deps.key?("ioredis")) ? "redis" : nil
+    end
+
+    def backend
+      (deps.key?("@supabase/supabase-js") || deps.key?("@supabase/ssr")) ? "supabase" : nil
     end
 
     private
