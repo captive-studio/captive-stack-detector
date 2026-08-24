@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module CaptiveStackDetector
-  Services = Data.define(:database, :queue)
+  Services = Data.define(:database, :queue, :backend)
   Worker   = Data.define(:command)
   Runtime  = Data.define(:ruby, :node)
   Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars, :system_packages)

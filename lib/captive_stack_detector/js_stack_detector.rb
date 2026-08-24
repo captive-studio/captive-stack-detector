@@ -17,7 +17,7 @@ module CaptiveStackDetector
       Result.new(
         type:            type,
         subtype:         @analyzer.subtype,
-        services:        Services.new(database: @analyzer.database, queue: @analyzer.queue),
+        services:        Services.new(database: @analyzer.database, queue: @analyzer.queue, backend: @analyzer.backend),
         worker:          build_worker,
         runtime:         Runtime.new(ruby: nil, node: @reader.node_version),
         env_vars:        {},

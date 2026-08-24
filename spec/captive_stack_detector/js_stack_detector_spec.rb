@@ -52,6 +52,20 @@ RSpec.describe CaptiveStackDetector::JsStackDetector do
     expect(result.services.queue).to eq("redis")
   end
 
+  it "retourne services.backend supabase si @supabase/ssr dans dependencies" do
+    pkg = JSON.generate({ "dependencies" => { "@supabase/ssr" => "^0.5" },
+                          "scripts" => { "start" => "next start" }, })
+    result = described_class.new(reader, pkg).detect
+    expect(result.services.backend).to eq("supabase")
+  end
+
+  it "force database postgres quand un backend supabase est détecté, même sans pg" do
+    pkg = JSON.generate({ "dependencies" => { "@supabase/supabase-js" => "^2.0" },
+                          "scripts" => { "start" => "next start" }, })
+    result = described_class.new(reader, pkg).detect
+    expect(result.services.database).to eq("postgres")
+  end
+
   it "retourne worker.command si Procfile contient une ligne worker:" do
     allow(reader).to receive(:read).with("Procfile").and_return("web: node server.js\nworker: node worker.js\n")
     pkg = JSON.generate({ "scripts" => { "start" => "node server.js" } })
