@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 
+require_relative "aptfile_parser"
+require_relative "gem_package_map"
+
 module CaptiveStackDetector
   class SystemPackageDetector
-    GEM_TO_PACKAGES = {
-      "ruby-vips"        => %w[libvips42 libvips-dev],
-      "mini_magick"      => %w[imagemagick],
-      "rmagick"          => %w[imagemagick],
-      "wkhtmltopdf-binary" => %w[], # retiré de Debian Trixie, projet upstream abandonné
-      "sqlite3"          => %w[libsqlite3-dev],
-    }.freeze
-
     def initialize(gemfile:, aptfile:)
       @gemfile = gemfile.to_s
       @aptfile = aptfile.to_s
@@ -24,18 +19,16 @@ module CaptiveStackDetector
     private
 
     def from_gemfile
-      GEM_TO_PACKAGES.each_with_object([]) do |(gem, pkgs), result|
-        next unless @gemfile.match?(/gem ['"]#{Regexp.escape(gem)}['"]/)
-
+      GemPackageMap.matches(@gemfile).each_with_object([]) do |(gem, pkgs), result|
         $stderr.puts "[captive-stack-detector] gem '#{gem}' détecté → #{pkgs.any? ? pkgs.join(", ") : "aucun paquet"}"
         result.concat(pkgs)
       end
     end
 
     def from_aptfile
-      packages = @aptfile.lines.map { |line| line.split("#", 2).first.to_s.strip }.reject(&:empty?)
-      packages.each { |pkg| $stderr.puts "[captive-stack-detector] Aptfile → paquet '#{pkg}'" }
-      packages
+      AptfileParser.parse(@aptfile).each do |pkg|
+        $stderr.puts "[captive-stack-detector] Aptfile → paquet '#{pkg}'"
+      end
     end
   end
 end
