@@ -7,6 +7,6 @@ on:
 
 jobs:
   ruby-ci:
-    uses: Captive-Studio/captive-ci/.github/workflows/ruby-ci.yml@d9eb6d1e1ae92f2fadff4d8665aa9a412c842321 # main
+    uses: Captive-Studio/captive-ci/.github/workflows/ruby-ci.yml@cd36f8582e92eadee6e6d594d3e951bb9ce7bbc7 # main
     with:
       lint-command: bundle exec rubocop -f github
