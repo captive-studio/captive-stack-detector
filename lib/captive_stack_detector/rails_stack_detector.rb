@@ -2,6 +2,7 @@
 
 require_relative "../captive_stack_detector"
 require_relative "system_package_detector"
+require_relative "solid_queue_worker"
 
 module CaptiveStackDetector
   class RailsStackDetector
@@ -27,7 +28,7 @@ module CaptiveStackDetector
     private
 
     def build_worker
-      command = @analyzer.worker_command(@reader.read("Procfile"))
+      command = @analyzer.worker_command(@reader.read("Procfile")) || SolidQueueWorker.new(@reader, @analyzer).command
       command ? Worker.new(command: command) : nil
     end
 

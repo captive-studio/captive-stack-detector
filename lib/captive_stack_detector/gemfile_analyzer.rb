@@ -17,6 +17,7 @@ module CaptiveStackDetector
     def subtype  = ASSET_GEMS.any? { |g| gem?(g) } ? "app" : "api"
     def database = gem?("pg") ? "postgres" : nil
     def queue    = REDIS_GEMS.any? { |g| gem?(g) } ? "redis" : nil
+    def solid_queue? = gem?("solid_queue")
 
     def worker_command(procfile)
       if procfile
