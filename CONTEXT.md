@@ -40,7 +40,7 @@ Résultat complet de la détection, retourné par `CaptiveStackDetector.detect(.
 - `subtype` — précision sur le type Rails : `app` (assets présents) ou `api` (pas d'assets). Voir **RailsSubtype**. `nil` pour Node et Expo.
 - `services.database` — `"postgres"` si dépendance détectée (`gem 'pg'` pour Rails ; `pg` ou `node-postgres` pour Node), `nil` sinon. Extensible à d'autres moteurs (`"mysql"`, etc.)
 - `services.queue` — `"redis"` si dépendance détectée (`gem 'redis'`, `gem 'sidekiq'` pour Rails ; `redis` ou `ioredis` pour Node), `nil` sinon.
-- `worker.command` — commande du worker : ligne `worker:` du Procfile en priorité, sinon `"bundle exec sidekiq"` si `gem 'sidekiq'` présent. `nil` si absent.
+- `worker.command` — commande du worker, par ordre de priorité : ligne `worker:` du Procfile ; `"bundle exec sidekiq"` si `gem 'sidekiq'` ; `"bin/jobs"` si `gem 'solid_queue'` **et** un **SolidQueueUsage**. `nil` sinon. Voir ADR 0002.
 - `runtime.ruby` — version Ruby extraite de `.tool-versions`, `nil` si absente.
 - `runtime.node` — version Node extraite de `.nvmrc`, `.tool-versions`, ou `package.json engines.node`, `nil` si absente.
 - `env_vars` — Hash des variables d'environnement requises détectées dans `config/storage.yml` (clé → `"placeholder"`). `{}` si aucune.
@@ -62,6 +62,17 @@ _Avoid_ : "mode API", "API-only"
 
 ---
 
+## SolidQueueUsage
+
+Preuve qu'une app Rails utilise réellement Solid Queue, au-delà de la gem ajoutée par défaut par Rails 8. Au moins un signal parmi :
+
+- **Tâche récurrente** : `config/recurring.yml` déclare une tâche (tous environnements) autre que `clear_solid_queue_finished_jobs`, générée par défaut.
+- **Job applicatif** : `app/jobs/` contient un fichier `.rb` autre que `application_job.rb`.
+
+_Avoid_ : "solid_queue détecté" (la gem seule n'est pas un usage)
+
+---
+
 ## FileContents
 
 La gem opère dans deux modes :
@@ -70,7 +81,7 @@ La gem opère dans deux modes :
 
 **Mode GitHub** (`github_token:` + `repo:`) : la gem fetche les fichiers via l'API GitHub REST avec le token fourni. Utilisé dans captive-dashboard lors de la création d'une app.
 
-Dans les deux modes, les fichiers lus sont : `Gemfile`, `package.json`, `Procfile`, `.tool-versions`, `.nvmrc`, `config/storage.yml`.
+Dans les deux modes, les fichiers lus sont : `Gemfile`, `package.json`, `Procfile`, `.tool-versions`, `.nvmrc`, `config/storage.yml`, `config/recurring.yml`. Le dossier `app/jobs/` est listé (sans lecture du contenu).
 
 ---
 

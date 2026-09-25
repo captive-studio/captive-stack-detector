@@ -28,12 +28,17 @@ module CaptiveStackDetector
       full = File.join(@path, filename)
       File.read(full, encoding: "utf-8") if File.exist?(full)
     end
+
+    def list(dir)
+      Dir.glob("#{dir}/**/*", base: @path).select { |entry| File.file?(File.join(@path, entry)) }.sort
+    end
   end
 
   class GithubFileReader
     extend Forwardable
 
     def_delegators :@parser, :ruby_version, :node_version, :env_vars
+    def_delegators :@client, :list
 
     def initialize(token, repo)
       @client = GithubApiClient.new(token, repo)

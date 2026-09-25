@@ -75,6 +75,47 @@ RSpec.describe CaptiveStackDetector do
         end
       end
 
+      it "retourne worker.command bin/jobs si gem solid_queue et un job applicatif" do
+        Dir.mktmpdir do |path|
+          File.write(File.join(path, "Gemfile"), "gem 'rails'\ngem 'solid_queue'")
+          FileUtils.mkdir_p(File.join(path, "app/jobs/billing"))
+          File.write(File.join(path, "app/jobs/application_job.rb"), "")
+          File.write(File.join(path, "app/jobs/billing/invoice_job.rb"), "")
+          result = described_class.detect(local_path: path)
+          expect(result.worker.command).to eq("bin/jobs")
+        end
+      end
+
+      it "retourne worker.command bin/jobs si gem solid_queue et une tâche récurrente" do
+        Dir.mktmpdir do |path|
+          File.write(File.join(path, "Gemfile"), "gem 'rails'\ngem 'solid_queue'")
+          FileUtils.mkdir_p(File.join(path, "config"))
+          File.write(File.join(path, "config/recurring.yml"), "production:\n  sync:\n    class: SyncJob\n    schedule: every hour\n")
+          result = described_class.detect(local_path: path)
+          expect(result.worker.command).to eq("bin/jobs")
+        end
+      end
+
+      it "retourne worker nil si gem solid_queue sans usage (template Rails 8)" do
+        Dir.mktmpdir do |path|
+          File.write(File.join(path, "Gemfile"), "gem 'rails'\ngem 'solid_queue'")
+          FileUtils.mkdir_p(File.join(path, "app/jobs"))
+          File.write(File.join(path, "app/jobs/application_job.rb"), "")
+          result = described_class.detect(local_path: path)
+          expect(result.worker).to be_nil
+        end
+      end
+
+      it "préfère sidekiq à solid_queue" do
+        Dir.mktmpdir do |path|
+          File.write(File.join(path, "Gemfile"), "gem 'rails'\ngem 'sidekiq'\ngem 'solid_queue'")
+          FileUtils.mkdir_p(File.join(path, "app/jobs"))
+          File.write(File.join(path, "app/jobs/sync_job.rb"), "")
+          result = described_class.detect(local_path: path)
+          expect(result.worker.command).to eq("bundle exec sidekiq")
+        end
+      end
+
       it "retourne worker nil si pas de sidekiq et pas de Procfile worker" do
         Dir.mktmpdir do |path|
           File.write(File.join(path, "Gemfile"), "gem 'rails'")
@@ -225,6 +266,15 @@ RSpec.describe CaptiveStackDetector do
         stub_github("Gemfile", "gem 'rails'")
         result = described_class.detect(github_token: token, repo: repo)
         expect(result.type).to eq("rails")
+      end
+
+      it "retourne worker.command bin/jobs depuis GitHub si solid_queue et un job applicatif" do
+        stub_github("Gemfile", "gem 'rails'\ngem 'solid_queue'")
+        stub_github_404("config/recurring.yml")
+        stub_request(:get, "https://api.github.com/repos/#{repo}/git/trees/HEAD?recursive=1")
+          .to_return(status: 200, body: JSON.generate({ "tree" => [ { "path" => "app/jobs/sync_job.rb", "type" => "blob" } ] }))
+        result = described_class.detect(github_token: token, repo: repo)
+        expect(result.worker.command).to eq("bin/jobs")
       end
 
       it "retourne type node depuis GitHub via package.json" do
