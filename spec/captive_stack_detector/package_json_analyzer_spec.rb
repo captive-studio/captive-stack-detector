@@ -30,6 +30,11 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     expect(described_class.new(pkg).database).to eq("postgres")
   end
 
+  it "retourne database postgres si le client postgres (postgres.js) est présent" do
+    pkg = JSON.generate({ "dependencies" => { "postgres" => "^3.4.9", "next" => "16.4.0" } })
+    expect(described_class.new(pkg).database).to eq("postgres")
+  end
+
   it "retourne database nil si pas de pg" do
     pkg = JSON.generate({ "dependencies" => { "express" => "^4.0" } })
     expect(described_class.new(pkg).database).to be_nil

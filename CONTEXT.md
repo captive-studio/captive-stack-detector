@@ -38,7 +38,7 @@ Résultat complet de la détection, retourné par `CaptiveStackDetector.detect(.
 
 - `type` — valeur de Stack (`rails`, `node`, `expo`)
 - `subtype` — précision sur le type Rails : `app` (assets présents) ou `api` (pas d'assets). Voir **RailsSubtype**. `nil` pour Node et Expo.
-- `services.database` — `"postgres"` si dépendance détectée (`gem 'pg'` pour Rails ; `pg` ou `node-postgres` pour Node), `nil` sinon. Extensible à d'autres moteurs (`"mysql"`, etc.)
+- `services.database` — `"postgres"` si dépendance détectée (`gem 'pg'` pour Rails ; `pg` ou `postgres` (postgres.js) pour Node ; les ORM comme Prisma ou Drizzle ne comptent pas, ils parlent aussi d'autres moteurs), `nil` sinon. Extensible à d'autres moteurs (`"mysql"`, etc.)
 - `services.queue` — `"redis"` si dépendance détectée (`gem 'redis'`, `gem 'sidekiq'` pour Rails ; `redis` ou `ioredis` pour Node), `nil` sinon.
 - `worker.command` — commande du worker, par ordre de priorité : ligne `worker:` du Procfile ; `"bundle exec sidekiq"` si `gem 'sidekiq'` ; `"bin/jobs"` si `gem 'solid_queue'` **et** un **SolidQueueUsage**. `nil` sinon. Voir ADR 0002.
 - `runtime.ruby` — version Ruby extraite de `.tool-versions`, `nil` si absente.
