@@ -8,6 +8,9 @@ require_relative "captive_stack_detector/rails_stack_detector"
 require_relative "captive_stack_detector/js_stack_detector"
 
 module CaptiveStackDetector
+  # Doc publique des stacks supportées, livrée dans la gem et affichée par le dashboard (ADR 0003).
+  DOC_PATH = File.expand_path("../docs/stacks.md", __dir__)
+
   def self.detect(local_path: nil, github_token: nil, repo: nil)
     reader = FileReader.build(local_path: local_path, github_token: github_token, repo: repo)
     detect_from(reader)
