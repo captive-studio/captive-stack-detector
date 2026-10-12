@@ -12,7 +12,7 @@ module CaptiveStackDetector
     end
 
     def detect
-      raise UnsupportedStack unless @analyzer.rails?
+      raise UnsupportedStack, :no_rails unless @analyzer.rails?
 
       Result.new(
         type:            "rails",

@@ -17,7 +17,8 @@ module CaptiveStackDetector
 
     def type
       return "expo" if deps.key?("expo")
-      return "node" if @parsed.dig("scripts", "start")
+      # build seul : une SPA, buildée puis servie en statique
+      return "node" if @parsed.dig("scripts", "start") || @parsed.dig("scripts", "build")
 
       nil
     end

@@ -15,6 +15,11 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     expect(described_class.new(pkg).type).to eq("node")
   end
 
+  it "retourne type node si seul un script build est présent (SPA)" do
+    pkg = JSON.generate({ "scripts" => { "build" => "vite build", "dev" => "vite" } })
+    expect(described_class.new(pkg).type).to eq("node")
+  end
+
   it "retourne nil si ni expo ni script start" do
     pkg = JSON.generate({ "name" => "my-app" })
     expect(described_class.new(pkg).type).to be_nil
