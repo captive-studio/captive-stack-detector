@@ -22,6 +22,7 @@ module CaptiveStackDetector
         runtime:         Runtime.new(ruby: nil, node: @reader.node_version),
         env_vars:        {},
         system_packages: [],
+        public_env_prefix: @analyzer.public_env_prefix,
       )
     end
 

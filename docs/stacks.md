@@ -65,6 +65,23 @@ Si votre `package.json` dépend de `next`, `nuxt`, `@sveltejs/kit` ou d'un paque
 - `@supabase/supabase-js` ou `@supabase/ssr` provisionne un backend Supabase.
 - Une ligne `worker: <commande>` dans un `Procfile` lance un worker.
 
+
+### Variables exposées au navigateur
+
+Une variable n'arrive dans le code du navigateur que si elle porte le préfixe de votre bundler. Captive le déduit de vos dépendances :
+
+| Dépendance | Préfixe |
+| --- | --- |
+| `expo` | `EXPO_PUBLIC_` |
+| `next` | `NEXT_PUBLIC_` |
+| `vite` | `VITE_` |
+
+Si plusieurs sont présentes, c'est le premier de la liste qui l'emporte (`vite` est souvent là pour les tests seulement).
+
+Avec un backend Supabase, Captive pose l'URL et la clé publique sous ce préfixe, avec les deux noms de clé en usage : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` et `VITE_SUPABASE_PUBLISHABLE_KEY` pour une application Vite, par exemple. Côté serveur, les mêmes valeurs sont disponibles sans préfixe : `SUPABASE_URL` et `SUPABASE_ANON_KEY`.
+
+Ces variables sont lues **au build** : après en avoir changé une, redéployez.
+
 ## Expo
 
 Condition : un `package.json` à la racine avec la dépendance `expo` (dans `dependencies` ou `devDependencies`). Aucun script n'est exigé.
