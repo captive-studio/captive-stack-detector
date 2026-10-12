@@ -9,12 +9,32 @@ Valeurs supportées :
 | Valeur | Condition |
 | --- | --- |
 | `rails` | Gemfile présent contenant `gem 'rails'` |
-| `node` | package.json présent avec un script `"start"`, sans dépendance `expo` |
+| `node` | package.json présent avec un script `"start"` ou `"build"`, sans dépendance `expo` |
 | `expo` | package.json présent avec la dépendance `expo` (script `"start"` non requis) |
 
-Tout autre cas lève `CaptiveStackDetector::UnsupportedStack`. En particulier, un package.json sans script `"start"` (package npm, librairie, monorepo racine) n'est pas une stack déployable.
+Tout autre cas lève `CaptiveStackDetector::UnsupportedStack`, avec une **UnsupportedReason**. Un package.json sans script `"start"` ni `"build"` (package npm, monorepo racine) n'est pas une stack déployable.
 
 _Avoid_ : "type d'app", "langage", "framework détecté"
+
+---
+
+## SPA
+
+Stack `node` sans subtype : le dépôt est buildé (`build` produit `dist/`) puis servi en fichiers statiques, sans process Node au runtime.
+
+_Avoid_ : "static", "site statique", "front Vite"
+
+---
+
+## UnsupportedReason
+
+Raison pour laquelle un dépôt n'est pas une Stack déployable.
+
+| Valeur | Cas |
+| --- | --- |
+| `no_manifest` | Ni Gemfile ni package.json à la racine |
+| `no_rails` | Gemfile sans la gem `rails` |
+| `no_node_entry` | package.json sans dépendance `expo` ni script `start` ou `build` |
 
 ---
 

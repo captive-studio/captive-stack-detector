@@ -12,7 +12,7 @@ module CaptiveStackDetector
 
     def detect
       type = @analyzer.type
-      raise UnsupportedStack unless type
+      raise UnsupportedStack, :no_node_entry unless type
 
       Result.new(
         type:            type,

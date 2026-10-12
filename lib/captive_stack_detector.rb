@@ -20,7 +20,7 @@ module CaptiveStackDetector
     return RailsStackDetector.new(reader, GemfileAnalyzer.new(gemfile)).detect if gemfile
     return JsStackDetector.new(reader, package_json).detect                    if package_json
 
-    raise UnsupportedStack
+    raise UnsupportedStack, :no_manifest
   end
   private_class_method :detect_from
 end

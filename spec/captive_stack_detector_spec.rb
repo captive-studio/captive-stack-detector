@@ -143,14 +143,16 @@ RSpec.describe CaptiveStackDetector do
 
       it "lève UnsupportedStack si ni Gemfile ni package.json" do
         Dir.mktmpdir do |path|
-          expect { described_class.detect(local_path: path) }.to raise_error(CaptiveStackDetector::UnsupportedStack)
+          expect { described_class.detect(local_path: path) }
+            .to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_manifest) }
         end
       end
 
       it "lève UnsupportedStack si Gemfile sans gem rails" do
         Dir.mktmpdir do |path|
           File.write(File.join(path, "Gemfile"), "gem 'sinatra'")
-          expect { described_class.detect(local_path: path) }.to raise_error(CaptiveStackDetector::UnsupportedStack)
+          expect { described_class.detect(local_path: path) }
+            .to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_rails) }
         end
       end
 

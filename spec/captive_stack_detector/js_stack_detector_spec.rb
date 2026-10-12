@@ -28,7 +28,7 @@ RSpec.describe CaptiveStackDetector::JsStackDetector do
 
   it "lève UnsupportedStack si pas de script start ni expo" do
     pkg = JSON.generate({ "name" => "my-app" })
-    expect { described_class.new(reader, pkg).detect }.to raise_error(CaptiveStackDetector::UnsupportedStack)
+    expect { described_class.new(reader, pkg).detect }.to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_node_entry) }
   end
 
   it "retourne runtime.node depuis le reader" do
