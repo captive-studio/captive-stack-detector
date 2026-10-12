@@ -79,4 +79,9 @@ RSpec.describe CaptiveStackDetector::JsStackDetector do
     result = described_class.new(reader, pkg).detect
     expect(result.worker).to be_nil
   end
+
+  it "expose le préfixe public dans le résultat" do
+    pkg = JSON.generate({ "scripts" => { "build" => "vite build" }, "devDependencies" => { "vite" => "7.0.0" } })
+    expect(described_class.new(reader, pkg).detect.public_env_prefix).to eq("VITE_")
+  end
 end

@@ -26,6 +26,14 @@ _Avoid_ : "static", "site statique", "front Vite"
 
 ---
 
+## Préfixe public
+
+Préfixe des variables d'environnement que le bundler front d'une stack JS expose au navigateur : `EXPO_PUBLIC_` (expo), `NEXT_PUBLIC_` (next), `VITE_` (vite), dans cet ordre de priorité. `nil` sans bundler front. La plateforme pose sous ce préfixe ce que le front doit lire au build, comme l'URL et la clé publique Supabase.
+
+_Avoid_ : "préfixe Next", "variables front"
+
+---
+
 ## UnsupportedReason
 
 Raison pour laquelle un dépôt n'est pas une Stack déployable.
