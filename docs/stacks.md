@@ -15,6 +15,7 @@ gem "rails", "8.1.0"
 - Avec une gem d'assets (`propshaft`, `sprockets-rails`, `importmap-rails`, `jsbundling-rails`, `cssbundling-rails`, `tailwindcss-rails`…), l'application est construite avec ses assets frontend.
 - Sans gem d'assets, elle est construite comme une API.
 - `gem "pg"` provisionne une base Postgres, `gem "redis"` ou `gem "sidekiq"` un Redis.
+- Les bibliothèques système exigées par certaines gems sont installées dans l'image : `ruby-vips` (libvips), `mini_magick` et `rmagick` (imagemagick), `sqlite3`, et `ethon` (libcurl), y compris quand la gem n'arrive qu'en dépendance d'une autre via le `Gemfile.lock`. Pour une bibliothèque non détectée, listez le paquet Debian dans un `Aptfile` à la racine.
 
 Si un `Gemfile` est présent, c'est toujours lui qui décide : un dépôt avec un `Gemfile` sans Rails est refusé, même s'il a aussi un `package.json`.
 

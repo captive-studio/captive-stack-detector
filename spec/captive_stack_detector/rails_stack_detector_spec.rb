@@ -18,4 +18,11 @@ RSpec.describe CaptiveStackDetector::RailsStackDetector do
     result = described_class.new(reader, analyzer).detect
     expect(result.type).to eq("rails")
   end
+
+  it "détecte les paquets système des gems transitifs du Gemfile.lock" do
+    allow(reader).to receive(:read).with("Gemfile.lock").and_return("GEM\n  specs:\n    ethon (0.18.0)\n")
+    analyzer = CaptiveStackDetector::GemfileAnalyzer.new("gem 'rails'")
+    result = described_class.new(reader, analyzer).detect
+    expect(result.system_packages).to eq(%w[libcurl4t64])
+  end
 end

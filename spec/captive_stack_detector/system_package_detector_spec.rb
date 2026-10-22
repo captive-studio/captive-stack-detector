@@ -49,6 +49,16 @@ RSpec.describe CaptiveStackDetector::SystemPackageDetector do
     end
   end
 
+  context "avec ethon en dépendance transitive dans le Gemfile.lock" do
+    subject(:detector) do
+      described_class.new(gemfile: "gem 'sib-api-v3-sdk'", aptfile: nil, lockfile: "GEM\n  specs:\n    ethon (0.18.0)\n")
+    end
+
+    it "retourne libcurl4t64, chargée par ethon via FFI" do
+      expect(detector.packages).to eq(%w[libcurl4t64])
+    end
+  end
+
   context "avec gem mini_magick" do
     let(:gemfile) { "gem 'mini_magick'" }
 
