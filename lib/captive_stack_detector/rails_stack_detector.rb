@@ -5,6 +5,7 @@ require_relative "system_package_detector"
 require_relative "solid_queue_worker"
 
 module CaptiveStackDetector
+  # Construit le Result d'une app Rails à partir des fichiers du repo.
   class RailsStackDetector
     def initialize(reader, analyzer)
       @reader   = reader
@@ -34,8 +35,9 @@ module CaptiveStackDetector
 
     def system_packages
       SystemPackageDetector.new(
-        gemfile: @reader.read("Gemfile"),
-        aptfile: @reader.read("Aptfile"),
+        gemfile:  @reader.read("Gemfile"),
+        aptfile:  @reader.read("Aptfile"),
+        lockfile: @reader.read("Gemfile.lock"),
       ).packages
     end
   end
