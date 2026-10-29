@@ -75,6 +75,21 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     expect(described_class.new(pkg).subtype).to eq("server")
   end
 
+  it "retourne subtype server pour Astro avec son adaptateur Node" do
+    pkg = JSON.generate({ "dependencies" => { "astro" => "^7.4.4", "@astrojs/node" => "^11.1.9" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
+
+  it "reconnaît aussi l'adaptateur Astro Node dans devDependencies" do
+    pkg = JSON.generate({ "dependencies" => { "astro" => "^7.4.4" }, "devDependencies" => { "@astrojs/node" => "^11.1.9" } })
+    expect(described_class.new(pkg).subtype).to eq("server")
+  end
+
+  it "garde Astro sans adaptateur Node en statique" do
+    pkg = JSON.generate({ "dependencies" => { "astro" => "^7.4.4" }, "scripts" => { "build" => "astro build" } })
+    expect(described_class.new(pkg).subtype).to be_nil
+  end
+
   describe "#public_env_prefix" do
     def prefixe(deps) = described_class.new(JSON.generate({ "dependencies" => deps })).public_env_prefix
 

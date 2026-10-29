@@ -3,7 +3,7 @@
 module CaptiveStackDetector
   # Reconnaît les frameworks JS rendus côté serveur (SSR) à partir des dépendances.
   module SsrFrameworkDetector
-    FRAMEWORKS = %w[next nuxt @sveltejs/kit].freeze
+    FRAMEWORKS = %w[next nuxt @sveltejs/kit @astrojs/node].freeze
     SCOPES     = %w[@remix-run/].freeze
 
     def self.server?(deps)
