@@ -43,9 +43,11 @@ Votre application est buildée une fois, puis servie en fichiers statiques. Aucu
 - Toutes les routes inconnues renvoient `index.html` : le routage côté client (React Router, Vue Router…) fonctionne sans configuration.
 - Les variables d'environnement sont injectées **au moment du build** (par exemple `VITE_SUPABASE_URL`). Après en avoir modifié une, redéployez.
 
-### Serveur Node (Next.js, Nuxt, SvelteKit, Remix)
+### Serveur Node (Next.js, Nuxt, SvelteKit, Remix, Astro)
 
-Si votre `package.json` dépend de `next`, `nuxt`, `@sveltejs/kit` ou d'un paquet `@remix-run/…`, Captive lance un vrai serveur Node avec votre script `start`.
+Si votre `package.json` dépend de `next`, `nuxt`, `@sveltejs/kit`, `@astrojs/node` ou d'un paquet `@remix-run/…`, Captive lance un vrai serveur Node avec votre script `start`.
+
+Pour Astro, utilisez l'adaptateur `@astrojs/node` en mode `standalone`, avec `output: 'server'`. Le script `start` doit lancer le serveur construit (par exemple `node ./dist/server/entry.mjs`) sur `0.0.0.0`, au port fourni par `PORT`. Les dépendances et les devDependencies sont prises en compte. Astro seul, sans adaptateur Node, reste servi en fichiers statiques.
 
 ```json
 {
