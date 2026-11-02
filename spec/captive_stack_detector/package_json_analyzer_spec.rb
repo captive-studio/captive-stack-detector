@@ -109,6 +109,7 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     def prefixe(deps) = described_class.new(JSON.generate({ "dependencies" => deps })).public_env_prefix
 
     it "donne le préfixe des variables exposées au navigateur, selon le bundler" do
+      expect(prefixe("astro" => "6.0.0")) .to eq("PUBLIC_")
       expect(prefixe("vite" => "7.0.0")).to eq("VITE_")
       expect(prefixe("next" => "15.0.0")).to eq("NEXT_PUBLIC_")
       expect(prefixe("expo" => "54.0.0")).to eq("EXPO_PUBLIC_")
@@ -116,6 +117,7 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
 
     # vite arrive souvent avec Vitest : ce n'est pas lui qui construit le front.
     it "préfère expo puis next à vite" do
+      expect(prefixe("astro" => "6.0.0", "vite" => "7.0.0")) .to eq("PUBLIC_")
       expect(prefixe("next" => "15.0.0", "vite" => "7.0.0")).to eq("NEXT_PUBLIC_")
       expect(prefixe("expo" => "54.0.0", "next" => "15.0.0")).to eq("EXPO_PUBLIC_")
     end

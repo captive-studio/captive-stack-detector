@@ -30,7 +30,7 @@ module CaptiveStackDetector
     end
 
     def list(dir)
-      Dir.glob("#{dir}/**/*", base: @path).select { |entry| File.file?(File.join(@path, entry)) }.sort
+      Dir.glob("#{dir}/**/*", File::FNM_DOTMATCH, base: @path).select { |entry| File.file?(File.join(@path, entry)) }.sort
     end
   end
 
