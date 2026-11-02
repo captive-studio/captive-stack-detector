@@ -6,7 +6,7 @@ require "captive_stack_detector"
 require "captive_stack_detector/js_stack_detector"
 
 RSpec.describe CaptiveStackDetector::JsStackDetector do
-  let(:reader) { double("reader", node_version: nil, read: nil) }
+  let(:reader) { double("reader", node_version: nil, read: nil, list: []) }
 
   it "retourne type node pour un package.json avec script start" do
     pkg = JSON.generate({ "scripts" => { "start" => "node server.js" } })

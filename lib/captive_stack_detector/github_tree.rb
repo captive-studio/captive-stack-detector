@@ -9,7 +9,7 @@ module CaptiveStackDetector
     end
 
     def files_in(dir)
-      prefix = "#{dir}/"
+      prefix = dir == "." ? "" : "#{dir}/"
       @entries.filter_map { |entry| entry["path"] if entry["type"] == "blob" && entry["path"].start_with?(prefix) }
     end
   end

@@ -5,7 +5,7 @@ require_relative "ssr_framework_detector"
 
 module CaptiveStackDetector
   class PackageJsonAnalyzer
-    PUBLIC_ENV_PREFIXES = { "expo" => "EXPO_PUBLIC_", "next" => "NEXT_PUBLIC_", "vite" => "VITE_" }.freeze
+    PUBLIC_ENV_PREFIXES = { "expo" => "EXPO_PUBLIC_", "next" => "NEXT_PUBLIC_", "astro" => "PUBLIC_", "vite" => "VITE_" }.freeze
     # Des clients, pas des ORM : Prisma ou Drizzle parlent aussi MySQL et SQLite, leur
     # présence ne dit pas que l'app attend une base Postgres.
     POSTGRES_CLIENTS = %w[pg postgres].freeze
