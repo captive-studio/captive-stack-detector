@@ -90,10 +90,26 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
     expect(described_class.new(pkg).subtype).to be_nil
   end
 
+  %w[@tanstack/react-start @tanstack/solid-start].each do |framework|
+    %w[dependencies devDependencies].each do |section|
+      it "retourne subtype server pour #{framework} dans #{section}" do
+        pkg = JSON.generate({ section => { framework => "1.0.0" }, "scripts" => { "build" => "vite build" } })
+        expect(described_class.new(pkg).subtype).to eq("server")
+      end
+    end
+  end
+
+  it "garde TanStack Router sans Start en statique" do
+    pkg = JSON.generate({ "dependencies" => { "@tanstack/react-router" => "1.0.0" },
+                          "scripts" => { "build" => "vite build" }, })
+    expect(described_class.new(pkg).subtype).to be_nil
+  end
+
   describe "#public_env_prefix" do
     def prefixe(deps) = described_class.new(JSON.generate({ "dependencies" => deps })).public_env_prefix
 
     it "donne le préfixe des variables exposées au navigateur, selon le bundler" do
+      expect(prefixe("astro" => "6.0.0")) .to eq("PUBLIC_")
       expect(prefixe("vite" => "7.0.0")).to eq("VITE_")
       expect(prefixe("next" => "15.0.0")).to eq("NEXT_PUBLIC_")
       expect(prefixe("expo" => "54.0.0")).to eq("EXPO_PUBLIC_")
@@ -101,6 +117,7 @@ RSpec.describe CaptiveStackDetector::PackageJsonAnalyzer do
 
     # vite arrive souvent avec Vitest : ce n'est pas lui qui construit le front.
     it "préfère expo puis next à vite" do
+      expect(prefixe("astro" => "6.0.0", "vite" => "7.0.0")) .to eq("PUBLIC_")
       expect(prefixe("next" => "15.0.0", "vite" => "7.0.0")).to eq("NEXT_PUBLIC_")
       expect(prefixe("expo" => "54.0.0", "next" => "15.0.0")).to eq("EXPO_PUBLIC_")
     end

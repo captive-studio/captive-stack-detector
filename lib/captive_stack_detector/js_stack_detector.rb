@@ -2,6 +2,7 @@
 
 require_relative "../captive_stack_detector"
 require_relative "package_json_analyzer"
+require_relative "js_env_detector"
 
 module CaptiveStackDetector
   class JsStackDetector
@@ -20,7 +21,7 @@ module CaptiveStackDetector
         services:        Services.new(database: @analyzer.database, queue: @analyzer.queue, backend: @analyzer.backend),
         worker:          build_worker,
         runtime:         Runtime.new(ruby: nil, node: @reader.node_version),
-        env_vars:        {},
+        env_vars:        JsEnvDetector.new(@reader).detect,
         system_packages: [],
         public_env_prefix: @analyzer.public_env_prefix,
       )

@@ -254,6 +254,8 @@ RSpec.describe CaptiveStackDetector do
       end
 
       before(:each) do
+        stub_request(:get, "https://api.github.com/repos/#{repo}/git/trees/HEAD?recursive=1")
+          .to_return(body: JSON.generate({ "tree" => [] }))
         stub_github_404("Gemfile")
         stub_github_404("package.json")
         stub_github_404(".tool-versions")

@@ -43,9 +43,9 @@ Votre application est buildée une fois, puis servie en fichiers statiques. Aucu
 - Toutes les routes inconnues renvoient `index.html` : le routage côté client (React Router, Vue Router…) fonctionne sans configuration.
 - Les variables d'environnement sont injectées **au moment du build** (par exemple `VITE_SUPABASE_URL`). Après en avoir modifié une, redéployez.
 
-### Serveur Node (Next.js, Nuxt, SvelteKit, Remix, Astro)
+### Serveur Node (Next.js, Nuxt, SvelteKit, Remix, Astro, TanStack Start)
 
-Si votre `package.json` dépend de `next`, `nuxt`, `@sveltejs/kit`, `@astrojs/node` ou d'un paquet `@remix-run/…`, Captive lance un vrai serveur Node avec votre script `start`.
+Si votre `package.json` dépend de `next`, `nuxt`, `@sveltejs/kit`, `@astrojs/node`, `@tanstack/react-start`, `@tanstack/solid-start` ou d'un paquet `@remix-run/…`, Captive lance un vrai serveur Node avec votre script `start`.
 
 Pour Astro, utilisez l'adaptateur `@astrojs/node` en mode `standalone`, avec `output: 'server'`. Le script `start` doit lancer le serveur construit (par exemple `node ./dist/server/entry.mjs`) sur `0.0.0.0`, au port fourni par `PORT`. Les dépendances et les devDependencies sont prises en compte. Astro seul, sans adaptateur Node, reste servi en fichiers statiques.
 
@@ -69,6 +69,30 @@ Pour Astro, utilisez l'adaptateur `@astrojs/node` en mode `standalone`, avec `ou
 - Une ligne `worker: <commande>` dans un `Procfile` lance un worker.
 
 
+### Variables à renseigner
+
+La détection Node recherche les lectures à clé littérale `process.env.MA_CLE`,
+`process.env["MA_CLE"]`, `import.meta.env.MA_CLE` et `import.meta.env["MA_CLE"]`
+dans les sources JavaScript, TypeScript, JSX, TSX, Astro, Vue et Svelte, y compris les
+fichiers de configuration à la racine. Les imports nommés de `astro:env/client` et
+`astro:env/server` sont également reconnus.
+
+Les modèles `.env.example`, `.env.sample` et `.env.template` à la racine déclarent aussi
+des noms de variables à renseigner. **Leurs valeurs ne sont jamais reprises** : chaque nom
+est signalé avec la valeur `placeholder`. Les fichiers `.env`, `.env.local` et les autres
+fichiers d'environnement réels ne sont pas lus.
+
+Les commentaires, chaînes d'exemple, dépendances, sorties de build, scripts d'outillage
+(`scripts/`, `bin/`), documentation, exemples, tests, stories et
+déclarations TypeScript sont ignorés. Les constantes intégrées de Vite et les variables
+`NODE_ENV`, `NODE_OPTIONS`, `HOST` et `PORT` ne sont pas demandées. Une lecture avec une
+valeur de repli littérale (`?? "local"`, `|| "local"`, nombre ou booléen) est facultative ;
+une lecture sans repli ailleurs, ou sa déclaration dans un modèle, demande toujours la clé.
+
+L'analyse est statique : les clés calculées, la déstructuration et les appels indirects
+(comme `getSecret(nom)`) ne sont pas déduits. Déclarez ces clés dans un modèle si nécessaire.
+La même analyse est utilisée sur les dépôts locaux et GitHub.
+
 ### Variables exposées au navigateur
 
 Une variable n'arrive dans le code du navigateur que si elle porte le préfixe de votre bundler. Captive le déduit de vos dépendances :
@@ -77,6 +101,7 @@ Une variable n'arrive dans le code du navigateur que si elle porte le préfixe d
 | --- | --- |
 | `expo` | `EXPO_PUBLIC_` |
 | `next` | `NEXT_PUBLIC_` |
+| `astro` | `PUBLIC_` |
 | `vite` | `VITE_` |
 
 Si plusieurs sont présentes, c'est le premier de la liste qui l'emporte (`vite` est souvent là pour les tests seulement).
