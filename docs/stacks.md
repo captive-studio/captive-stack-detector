@@ -116,7 +116,7 @@ Condition : ni `Gemfile` ni `package.json` à la racine, mais un `public/index.h
 
 - Si `public/` existe, seul ce dossier est servi.
 - Sinon la racine est servie, limitée aux fichiers web (HTML, JavaScript, CSS, JSON, images, polices, manifeste, texte). Les dossiers cachés (`.git/`, `.github/`), `supabase/`, vos scripts SQL ou votre documentation ne sont jamais publiés.
-- Un dossier `supabase/` avec son `config.toml` provisionne un backend Supabase.
+- Un dossier `supabase/` avec son `config.toml` provisionne un backend Supabase et sa base Postgres.
 - Faute de build, aucune variable n'est injectée : votre code lit directement l'adresse de l'API, par exemple `location.origin`.
 
 ## Expo
