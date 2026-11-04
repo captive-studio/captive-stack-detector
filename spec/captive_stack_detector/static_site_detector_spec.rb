@@ -24,7 +24,8 @@ RSpec.describe CaptiveStackDetector::StaticSiteDetector do
   it "classe node, sans subtype ni service, un dépôt sans manifeste qui a public/index.html" do
     write("public/index.html")
 
-    expect(detect).to have_attributes(type: "node", subtype: nil, worker: nil, env_vars: [], system_packages: [])
+    # env_vars est un Hash pour toutes les stacks : captive-admin le fusionne (merge) au provisionnement.
+    expect(detect).to have_attributes(type: "node", subtype: nil, worker: nil, env_vars: {}, system_packages: [])
     expect(detect.services).to have_attributes(database: nil, queue: nil, backend: nil)
   end
 
