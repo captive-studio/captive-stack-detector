@@ -8,7 +8,11 @@ module CaptiveStackDetector
   # (VITE_, NEXT_PUBLIC_, EXPO_PUBLIC_), nil sans bundler front (PackageJsonAnalyzer).
   Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars, :system_packages,
                          :public_env_prefix) do
-    def initialize(public_env_prefix: nil, **) = super
+    # env_vars : { "NOM" => valeur }, fusionné par captive-admin au provisionnement.
+    def initialize(env_vars:, public_env_prefix: nil, **)
+      Hash.try_convert(env_vars) or raise ArgumentError, "env_vars doit être un Hash"
+      super
+    end
   end
 
   # reason : :no_manifest, :no_rails ou :no_node_entry, pour que l'appelant explique le refus.
