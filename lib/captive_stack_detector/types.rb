@@ -4,12 +4,14 @@ module CaptiveStackDetector
   Services = Data.define(:database, :queue, :backend)
   Worker   = Data.define(:command)
   Runtime  = Data.define(:ruby, :node)
+  # Option d'add-on que la détection propose d'activer, avec sa raison lisible par le client.
+  Recommendation = Data.define(:addon, :option, :reason)
   # public_env_prefix : préfixe des variables que le bundler expose au navigateur
   # (VITE_, NEXT_PUBLIC_, EXPO_PUBLIC_), nil sans bundler front (PackageJsonAnalyzer).
   Result   = Data.define(:type, :subtype, :services, :worker, :runtime, :env_vars, :system_packages,
-                         :public_env_prefix) do
+                         :public_env_prefix, :recommendations) do
     # env_vars : { "NOM" => valeur }, fusionné par captive-admin au provisionnement.
-    def initialize(env_vars:, public_env_prefix: nil, **)
+    def initialize(env_vars:, public_env_prefix: nil, recommendations: [], **)
       Hash.try_convert(env_vars) or raise ArgumentError, "env_vars doit être un Hash"
       super
     end

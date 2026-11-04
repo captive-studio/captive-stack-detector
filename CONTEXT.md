@@ -80,6 +80,24 @@ Résultat complet de la détection, retourné par `CaptiveStackDetector.detect(.
 - `runtime.ruby` — version Ruby extraite de `.tool-versions`, `nil` si absente.
 - `runtime.node` — version Node extraite de `.nvmrc`, `.tool-versions`, ou `package.json engines.node`, `nil` si absente.
 - `env_vars` — Hash des variables d'environnement requises détectées dans `config/storage.yml` (clé → `"placeholder"`). `{}` si aucune.
+- `recommendations` — liste de **Recommandation**, `[]` par défaut et pour tout backend autre que Supabase.
+
+---
+
+## Recommandation
+
+Option d'add-on que la détection propose d'activer, avec sa raison : `Recommendation(addon:, option:, reason:)`, par exemple `addon: "supabase", option: "smtp", reason: "votre code appelle signUp"`. La gem recommande, le dashboard affiche la raison, le provisionnement active l'option.
+
+| Option | Signal |
+| --- | --- |
+| `smtp` | Le code JS/TS appelle `signUp`, `resetPasswordForEmail`, `signInWithOtp`, `inviteUserByEmail` ou `updateUser({ email`. `signInWithPassword` et `auth.mfa.*` n'envoient pas d'email. |
+| `realtime` | Le code JS/TS appelle `.channel(` ou écoute `postgres_changes`. |
+| `pg_cron` | Un fichier `.sql` appelle `cron.schedule` ou `net.http_` (pg_net va avec pg_cron). |
+| `vault` | Un fichier `.sql` appelle `vault.` (`vault.create_secret`, `vault.decrypted_secrets`…). |
+
+Les sources sont choisies comme pour les variables d'environnement : dépendances, builds, tests et fichiers vendored sont ignorés.
+
+_Avoid_ : "suggestion", "option détectée" (l'option n'est pas active tant que le provisionnement ne l'a pas appliquée)
 
 ---
 
