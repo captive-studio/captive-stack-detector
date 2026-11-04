@@ -9,7 +9,7 @@ Valeurs supportées :
 | Valeur | Condition |
 | --- | --- |
 | `rails` | Gemfile présent contenant `gem 'rails'` |
-| `node` | package.json présent avec un script `"start"` ou `"build"`, sans dépendance `expo` |
+| `node` | package.json présent avec un script `"start"` ou `"build"`, sans dépendance `expo` ; ou Site statique |
 | `expo` | package.json présent avec la dépendance `expo` (script `"start"` non requis) |
 
 Tout autre cas lève `CaptiveStackDetector::UnsupportedStack`, avec une **UnsupportedReason**. Un package.json sans script `"start"` ni `"build"` (package npm, monorepo racine) n'est pas une stack déployable.
@@ -23,6 +23,14 @@ _Avoid_ : "type d'app", "langage", "framework détecté"
 Stack `node` sans subtype : le dépôt est buildé (`build` produit `dist/`) puis servi en fichiers statiques, sans process Node au runtime.
 
 _Avoid_ : "static", "site statique", "front Vite"
+
+---
+
+## Site statique
+
+Stack `node` sans subtype d'un dépôt sans Gemfile ni package.json, qui a `public/index.html` ou `index.html` : rien n'est buildé, les fichiers sont servis tels quels. Le backend Supabase se reconnaît à `supabase/config.toml`.
+
+_Avoid_ : "SPA" (une SPA est buildée), "site HTML"
 
 ---
 
@@ -40,7 +48,7 @@ Raison pour laquelle un dépôt n'est pas une Stack déployable.
 
 | Valeur | Cas |
 | --- | --- |
-| `no_manifest` | Ni Gemfile ni package.json à la racine |
+| `no_manifest` | Ni Gemfile ni package.json ni `index.html` (racine ou `public/`) |
 | `no_rails` | Gemfile sans la gem `rails` |
 | `no_node_entry` | package.json sans dépendance `expo` ni script `start` ou `build` |
 

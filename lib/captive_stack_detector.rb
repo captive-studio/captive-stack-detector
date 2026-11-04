@@ -6,6 +6,7 @@ require_relative "captive_stack_detector/file_reader"
 require_relative "captive_stack_detector/gemfile_analyzer"
 require_relative "captive_stack_detector/rails_stack_detector"
 require_relative "captive_stack_detector/js_stack_detector"
+require_relative "captive_stack_detector/static_site_detector"
 
 module CaptiveStackDetector
   # Doc publique des stacks supportées, livrée dans la gem et affichée par le dashboard (ADR 0003).
@@ -23,7 +24,10 @@ module CaptiveStackDetector
     return RailsStackDetector.new(reader, GemfileAnalyzer.new(gemfile)).detect if gemfile
     return JsStackDetector.new(reader, package_json).detect                    if package_json
 
-    raise UnsupportedStack, :no_manifest
+    static_site = StaticSiteDetector.new(reader)
+    raise UnsupportedStack, :no_manifest unless static_site.site?
+
+    static_site.detect
   end
   private_class_method :detect_from
 end

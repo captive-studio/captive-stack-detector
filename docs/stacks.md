@@ -110,6 +110,15 @@ Avec un backend Supabase, Captive pose l'URL et la clé publique sous ce préfix
 
 Ces variables sont lues **au build** : après en avoir changé une, redéployez.
 
+### Site statique sans build
+
+Condition : ni `Gemfile` ni `package.json` à la racine, mais un `public/index.html` ou un `index.html` à la racine. Rien n'est installé ni buildé : vos fichiers sont servis tels quels.
+
+- Si `public/` existe, seul ce dossier est servi.
+- Sinon la racine est servie, limitée aux fichiers web (HTML, JavaScript, CSS, JSON, images, polices, manifeste, texte). Les dossiers cachés (`.git/`, `.github/`), `supabase/`, vos scripts SQL ou votre documentation ne sont jamais publiés.
+- Un dossier `supabase/` avec son `config.toml` provisionne un backend Supabase.
+- Faute de build, aucune variable n'est injectée : votre code lit directement l'adresse de l'API, par exemple `location.origin`.
+
 ## Expo
 
 Condition : un `package.json` à la racine avec la dépendance `expo` (dans `dependencies` ou `devDependencies`). Aucun script n'est exigé.
@@ -126,7 +135,7 @@ Condition : un `package.json` à la racine avec la dépendance `expo` (dans `dep
 
 | Message | Cause | Que faire |
 | --- | --- | --- |
-| Aucun Gemfile ni package.json à la racine du dépôt. | Pas de fichier de dépendances à la racine. | Vérifiez que l'application est bien à la racine du dépôt, pas dans un sous-dossier (`app/`, `frontend/`…). Les monorepos ne sont pas pris en charge. |
+| Aucun Gemfile ni package.json à la racine du dépôt. | Pas de fichier de dépendances ni d'`index.html` à la racine. | Vérifiez que l'application est bien à la racine du dépôt, pas dans un sous-dossier (`app/`, `frontend/`…). Les monorepos ne sont pas pris en charge. |
 | Gemfile trouvé, mais sans la gem rails. | Application Ruby non Rails (Sinatra, Hanami…), ou `Gemfile` d'outillage dans un projet JavaScript. | Seul Rails est pris en charge côté Ruby. Si le `Gemfile` ne sert qu'à de l'outillage, retirez-le du dépôt. |
 | package.json trouvé, mais sans dépendance expo ni script start ou build. | Captive ne sait pas comment construire l'application. | Ajoutez un script `build` (application web) ou `start` (serveur), comme dans les exemples ci-dessus. |
 
