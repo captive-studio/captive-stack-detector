@@ -33,7 +33,9 @@ RSpec.describe CaptiveStackDetector::StaticSiteDetector do
     write("index.html")
     write("supabase/config.toml")
 
-    expect(detect.services.backend).to eq("supabase")
+    # Supabase repose sur Postgres, comme pour une stack Node : sans la base, le provisionnement
+    # écrit un Supabase sans cluster et services check le refuse.
+    expect(detect.services).to have_attributes(backend: "supabase", database: "postgres")
   end
 
   it "refuse toujours un dépôt sans manifeste ni index.html" do
