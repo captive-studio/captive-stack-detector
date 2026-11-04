@@ -119,6 +119,19 @@ Condition : ni `Gemfile` ni `package.json` à la racine, mais un `public/index.h
 - Un dossier `supabase/` avec son `config.toml` provisionne un backend Supabase et sa base Postgres.
 - Faute de build, aucune variable n'est injectée : votre code lit directement l'adresse de l'API, par exemple `location.origin`.
 
+## Options Supabase recommandées
+
+Avec un backend Supabase (application Node ou site statique), Captive lit votre code et vous recommande les options de l'add-on dont il a besoin, chacune avec sa raison (par exemple « votre code appelle signUp »). Une recommandation ne s'active pas seule : vous la retrouvez dans le dashboard au moment de la création.
+
+| Option | Recommandée quand |
+| --- | --- |
+| `smtp` | votre JavaScript ou TypeScript appelle `signUp`, `resetPasswordForEmail`, `signInWithOtp`, `inviteUserByEmail` ou `updateUser({ email })` : Supabase doit envoyer un email. Une connexion par `signInWithPassword` ou la double authentification (`auth.mfa`) n'en envoie pas. |
+| `realtime` | votre code s'abonne à un canal (`.channel(`) ou aux changements de la base (`postgres_changes`). |
+| `pg_cron` | un fichier `.sql` du dépôt (dont `supabase/migrations/` et `db/`) appelle `cron.schedule`, ou `net.http_` (pg_net est livré avec pg_cron). |
+| `vault` | un fichier `.sql` utilise le coffre Supabase (`vault.create_secret`, `vault.decrypted_secrets`…). |
+
+Les dépendances (`node_modules/`), sorties de build, tests et fichiers vendored sont ignorés, comme pour les variables. L'analyse est statique : un appel construit dynamiquement n'est pas vu ; activez alors l'option vous-même.
+
 ## Expo
 
 Condition : un `package.json` à la racine avec la dépendance `expo` (dans `dependencies` ou `devDependencies`). Aucun script n'est exigé.

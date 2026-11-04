@@ -7,7 +7,9 @@ require_relative "captive_stack_detector/gemfile_analyzer"
 require_relative "captive_stack_detector/rails_stack_detector"
 require_relative "captive_stack_detector/js_stack_detector"
 require_relative "captive_stack_detector/static_site_detector"
+require_relative "captive_stack_detector/addon_recommender"
 
+# Déduit d'un dépôt sa stack, ses services et les options d'add-on à recommander.
 module CaptiveStackDetector
   # Doc publique des stacks supportées, livrée dans la gem et affichée par le dashboard (ADR 0003).
   DOC_PATH = File.expand_path("../docs/stacks.md", __dir__)
@@ -18,6 +20,11 @@ module CaptiveStackDetector
   end
 
   def self.detect_from(reader)
+    AddonRecommender.new(reader).apply(detect_stack(reader))
+  end
+  private_class_method :detect_from
+
+  def self.detect_stack(reader)
     gemfile      = reader.read("Gemfile")
     package_json = reader.read("package.json")
 
@@ -29,5 +36,5 @@ module CaptiveStackDetector
 
     static_site.detect
   end
-  private_class_method :detect_from
+  private_class_method :detect_stack
 end

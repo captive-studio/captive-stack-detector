@@ -21,6 +21,7 @@ RSpec.describe CaptiveStackDetector do
         system_packages: %w[libvips42]
       )
       expect(result.system_packages).to eq(%w[libvips42])
+      expect(result.recommendations).to eq([])
     end
 
     # captive-admin fusionne env_vars (merge) au provisionnement : un Array le faisait planter
