@@ -14,16 +14,15 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      # captive-small n'a pas de compilateur C (extensions natives type bigdecimal)
-      - run: sudo apt-get update && sudo apt-get install -y build-essential
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "4.0.9"
-          bundler-cache: true
       - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3
         with:
           generate_release_notes: true
-      - uses: rubygems/release-gem@v1
+      # Pas de bundle install : captive-small (512 Mo) ne tient pas la compilation des gems de dev
+      - uses: rubygems/configure-rubygems-credentials@v1
+      - run: gem build *.gemspec && gem push *.gem && rm *.gem
 
       - name: Publish to GPR
         run: |
