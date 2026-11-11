@@ -11,6 +11,8 @@ module CaptiveStackDetector
       @analyzer = PackageJsonAnalyzer.new(package_json)
     end
 
+    def entry? = !@analyzer.type.nil?
+
     def detect
       type = @analyzer.type
       raise UnsupportedStack, :no_node_entry unless type

@@ -44,8 +44,23 @@ RSpec.describe CaptiveStackDetector::StaticSiteDetector do
     expect { detect }.to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_manifest) }
   end
 
-  it "laisse le package.json décider quand il existe" do
+  it "sert en statique un index.html dont le package.json n'est que de l'outillage" do
     write("index.html")
+    write("supabase/config.toml")
+    write("package.json", { "devDependencies" => { "supabase" => "2" } }.to_json)
+
+    expect(detect).to have_attributes(type: "node", subtype: nil)
+    expect(detect.services).to have_attributes(backend: "supabase", database: "postgres")
+  end
+
+  it "laisse un package.json avec un script build décider, même avec un index.html" do
+    write("index.html")
+    write("package.json", { "scripts" => { "build" => "vite build" }, "dependencies" => { "vite" => "5" } }.to_json)
+
+    expect(detect).to have_attributes(type: "node", public_env_prefix: "VITE_")
+  end
+
+  it "refuse un package.json sans point d'entrée quand aucun index.html ne le rattrape" do
     write("package.json", { "dependencies" => { "lodash" => "4" } }.to_json)
 
     expect { detect }.to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_node_entry) }
