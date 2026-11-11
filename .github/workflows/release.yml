@@ -21,7 +21,7 @@ jobs:
         with:
           generate_release_notes: true
       # Pas de bundle install : captive-small (512 Mo) ne tient pas la compilation des gems de dev
-      - uses: rubygems/configure-rubygems-credentials@v1
+      - uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
       - run: gem build *.gemspec && gem push *.gem && rm *.gem
 
       - name: Publish to GPR
