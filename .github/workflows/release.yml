@@ -14,6 +14,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      # captive-small n'a pas de compilateur C (extensions natives type bigdecimal)
+      - run: sudo apt-get update && sudo apt-get install -y build-essential
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "4.0.9"
