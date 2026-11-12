@@ -9,6 +9,7 @@ RSpec.describe CaptiveStackDetector::RailsStackDetector do
     double("reader",
       read:        nil,
       ruby_version: nil,
+      node_version: nil,
       env_vars:    {},
     )
   end
@@ -24,5 +25,12 @@ RSpec.describe CaptiveStackDetector::RailsStackDetector do
     analyzer = CaptiveStackDetector::GemfileAnalyzer.new("gem 'rails'")
     result = described_class.new(reader, analyzer).detect
     expect(result.system_packages).to eq(%w[libcurl4t64])
+  end
+
+  it "reprend la version de Node déclarée par l'app" do
+    allow(reader).to receive(:node_version).and_return("26")
+    analyzer = CaptiveStackDetector::GemfileAnalyzer.new("gem 'rails'")
+    result = described_class.new(reader, analyzer).detect
+    expect(result.runtime.node).to eq("26")
   end
 end
