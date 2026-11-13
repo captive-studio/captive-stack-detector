@@ -45,6 +45,11 @@ RSpec.describe CaptiveStackDetector::GithubApiClient do
     expect(client.list("app/jobs")).to eq([])
   end
 
+  it "retourne nil si le contenu renvoyé est illisible" do
+    stub_request(:get, "https://api.github.com/repos/#{repo}/contents/Gemfile").to_return(status: 200, body: "oops")
+    expect(client.fetch("Gemfile")).to be_nil
+  end
+
   it "retourne nil pour un fichier absent" do
     stub_request(:get, "https://api.github.com/repos/#{repo}/contents/Gemfile").to_return(status: 404)
     expect(client.fetch("Gemfile")).to be_nil
