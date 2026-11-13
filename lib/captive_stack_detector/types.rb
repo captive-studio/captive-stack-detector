@@ -26,4 +26,17 @@ module CaptiveStackDetector
       super(reason&.to_s || "unsupported stack")
     end
   end
+
+  # GitHub n'a pas laissé lire le dépôt, ce qui ne dit rien de sa stack. `kind` dit pourquoi,
+  # pour que l'appelant l'explique : :unauthorized (jeton refusé), :rate_limited (quota épuisé),
+  # :forbidden (accès refusé), :server_error (panne GitHub), :network (pas de réponse).
+  class SourceUnavailable < StandardError
+    attr_reader :kind, :status
+
+    def initialize(kind = :network, status: nil, detail: nil)
+      @kind   = kind
+      @status = status
+      super(detail || "GitHub illisible : #{kind}#{" (#{status})" if status}")
+    end
+  end
 end

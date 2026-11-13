@@ -335,12 +335,11 @@ RSpec.describe CaptiveStackDetector do
         expect(result.runtime.node).to eq("18")
       end
 
-      it "gère l'erreur réseau GitHub en retournant nil pour le fichier" do
+      it "lève SourceUnavailable sur une erreur réseau plutôt que de conclure à une autre stack" do
         stub_request(:get, "#{api_url}/Gemfile")
           .to_raise(SocketError.new("getaddrinfo: nodename nor servname provided"))
-        stub_github("package.json", JSON.generate({ "scripts" => { "start" => "node server.js" } }))
-        result = described_class.detect(github_token: token, repo: repo)
-        expect(result.type).to eq("node")
+        expect { described_class.detect(github_token: token, repo: repo) }
+          .to raise_error(CaptiveStackDetector::SourceUnavailable) { |e| expect(e.kind).to eq(:network) }
       end
 
       it "retourne env_vars depuis storage.yml avec syntaxe ENV[\"KEY\"]" do

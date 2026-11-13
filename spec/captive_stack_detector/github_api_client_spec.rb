@@ -44,4 +44,35 @@ RSpec.describe CaptiveStackDetector::GithubApiClient do
     stub_request(:get, "https://api.github.com/repos/#{repo}/git/trees/HEAD?recursive=1").to_return(status: 404)
     expect(client.list("app/jobs")).to eq([])
   end
+
+  it "retourne nil pour un fichier absent" do
+    stub_request(:get, "https://api.github.com/repos/#{repo}/contents/Gemfile").to_return(status: 404)
+    expect(client.fetch("Gemfile")).to be_nil
+  end
+
+  {
+    { status: 401 } => :unauthorized,
+    { status: 403 } => :forbidden,
+    { status: 403, headers: { "x-ratelimit-remaining" => "0" } } => :rate_limited,
+    { status: 429 } => :rate_limited,
+    { status: 502 } => :server_error,
+  }.each do |reponse, kind|
+    it "lève SourceUnavailable(#{kind}) quand GitHub répond #{reponse}" do
+      stub_request(:get, "https://api.github.com/repos/#{repo}/contents/Gemfile").to_return(reponse)
+      expect { client.fetch("Gemfile") }.to raise_error(CaptiveStackDetector::SourceUnavailable) { |e|
+        expect([ e.kind, e.status ]).to eq([ kind, reponse[:status] ])
+      }
+    end
+  end
+
+  it "retourne une liste vide pour un dépôt vide" do
+    stub_request(:get, "https://api.github.com/repos/#{repo}/git/trees/HEAD?recursive=1").to_return(status: 409)
+    expect(client.list("app")).to eq([])
+  end
+
+  it "lève SourceUnavailable(:network) quand GitHub ne répond pas" do
+    stub_request(:get, "https://api.github.com/repos/#{repo}/contents/Gemfile").to_timeout
+    expect { client.fetch("Gemfile") }
+      .to raise_error(CaptiveStackDetector::SourceUnavailable) { |e| expect(e.kind).to eq(:network) }
+  end
 end
