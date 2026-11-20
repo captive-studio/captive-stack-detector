@@ -17,12 +17,14 @@ module CaptiveStackDetector
     end
   end
 
-  # reason : :no_manifest, :no_rails ou :no_node_entry, pour que l'appelant explique le refus.
+  # reason : :no_manifest, :monorepo, :no_rails ou :no_node_entry, pour que l'appelant explique le refus.
+  # directories : sous-dossiers porteurs d'un manifeste quand reason vaut :monorepo.
   class UnsupportedStack < StandardError
-    attr_reader :reason
+    attr_reader :reason, :directories
 
-    def initialize(reason = nil)
+    def initialize(reason = nil, directories: [])
       @reason = reason
+      @directories = directories
       super(reason&.to_s || "unsupported stack")
     end
   end
