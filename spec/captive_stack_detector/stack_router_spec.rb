@@ -17,4 +17,13 @@ RSpec.describe CaptiveStackDetector::StackRouter do
     expect { described_class.new(reader({})).detect }
       .to raise_error(CaptiveStackDetector::UnsupportedStack) { |e| expect(e.reason).to eq(:no_manifest) }
   end
+
+  it "signale un monorepo quand seuls des sous-dossiers portent un manifeste" do
+    files = %w[admin/package.json api/package.json app/package.json app/android/build.gradle README.md]
+    monorepo = reader({}).tap { |r| allow(r).to receive(:list).with(".").and_return(files) }
+
+    expect { described_class.new(monorepo).detect }.to raise_error(CaptiveStackDetector::UnsupportedStack) { |e|
+      expect(e).to have_attributes(reason: :monorepo, directories: %w[admin api app])
+    }
+  end
 end

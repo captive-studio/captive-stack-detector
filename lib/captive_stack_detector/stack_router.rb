@@ -24,9 +24,20 @@ module CaptiveStackDetector
       # un index.html présent reste servi tel quel au lieu d'un refus no_node_entry.
       js = package_json && JsStackDetector.new(@reader, package_json)
       return js.detect if js && (js.entry? || !static_site.site?)
-      raise UnsupportedStack, :no_manifest unless static_site.site?
+      return static_site.detect if static_site.site?
 
-      static_site.detect
+      raise UnsupportedStack.new(:monorepo, directories: manifest_directories) if manifest_directories.any?
+      raise UnsupportedStack, :no_manifest
+    end
+
+    private
+
+    # Un dépôt sans manifeste racine mais avec des sous-projets (admin/, api/…) est un monorepo :
+    # le dire, plutôt que « aucun manifeste ».
+    SUBPROJECT_MANIFEST = %r{\A([^/]+)/(?:Gemfile|package\.json)\z}
+
+    def manifest_directories
+      @manifest_directories ||= @reader.list(".").filter_map { |path| path.delete_prefix("./")[SUBPROJECT_MANIFEST, 1] }.uniq.sort
     end
   end
 end
