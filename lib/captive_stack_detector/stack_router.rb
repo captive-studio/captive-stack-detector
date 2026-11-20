@@ -5,6 +5,7 @@ require_relative "gemfile_analyzer"
 require_relative "rails_stack_detector"
 require_relative "js_stack_detector"
 require_relative "static_site_detector"
+require_relative "missing_manifest"
 
 module CaptiveStackDetector
   # Aiguille un dépôt vers le détecteur de sa stack, d'après ses manifestes à la racine.
@@ -26,18 +27,7 @@ module CaptiveStackDetector
       return js.detect if js && (js.entry? || !static_site.site?)
       return static_site.detect if static_site.site?
 
-      raise UnsupportedStack.new(:monorepo, directories: manifest_directories) if manifest_directories.any?
-      raise UnsupportedStack, :no_manifest
-    end
-
-    private
-
-    # Un dépôt sans manifeste racine mais avec des sous-projets (admin/, api/…) est un monorepo :
-    # le dire, plutôt que « aucun manifeste ».
-    SUBPROJECT_MANIFEST = %r{\A([^/]+)/(?:Gemfile|package\.json)\z}
-
-    def manifest_directories
-      @manifest_directories ||= @reader.list(".").filter_map { |path| path.delete_prefix("./")[SUBPROJECT_MANIFEST, 1] }.uniq.sort
+      raise MissingManifest.error(@reader)
     end
   end
 end
